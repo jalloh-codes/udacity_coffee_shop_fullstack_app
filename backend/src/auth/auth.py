@@ -61,7 +61,7 @@ def get_token_auth_header():
 
     token = parts[1]
     return token
-
+ 
 
 '''
 @TODO implement check_permissions(permission, payload) method
@@ -85,6 +85,7 @@ def check_permissions(permission, payload):
         }, 401)
     
     return True
+
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -137,9 +138,6 @@ def verify_decode_jwt(token):
             raise AuthError({
                 'code': 'token_expired',
                 'description': 'Token expired.'
-                # 'code': 'invaled_claims',
-                # 'description': 'Incorrect claims Please'
-                # 'check the audience and issuer'
             }, 401)
         
         except jwt.JWTClaimsError:

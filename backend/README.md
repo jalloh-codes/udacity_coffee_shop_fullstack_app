@@ -32,6 +32,7 @@ This will install all of the required packages we selected within the `requireme
 
 ## Running the server
 
+
 From within the `./src` directory first ensure you are working using your created virtual environment.
 
 Each time you open a new terminal session, run:
@@ -69,17 +70,15 @@ The `--reload` flag will detect file changes and restart the server automaticall
         - can `get:drinks-detail`
     - Manager
         - can perform all actions
-7. Test your endpoints with [Postman](https://getpostman.com). 
+7. Adding Auth0 information
+    inside  the`./backend/src/auth/auth.py` add the following infromations.
+    - your Auth0 domain to the `AUTH0_DOMAIN` variable.
+    - your api audience to the `API_AUDIENCE` variable.
+8. Test your endpoints with [Postman](https://getpostman.com). 
     - Register 2 users - assign the Barista role to one and Manager role to the other.
     - Sign into each account and make note of the JWT.
-    - Import the postman collection `./starter_code/backend/udacity-fsnd-udaspicelatte.postman_collection.json`
+    - Import the postman collection `./backend/udacity-fsnd-udaspicelatte.postman_collection.json`
     - Right-clicking the collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
     - Run the collection and correct any errors.
     - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
 
-### Implement The Server
-
-There are `@TODO` comments throughout the `./backend/src`. We recommend tackling the files in order and from top to bottom:
-
-1. `./src/auth/auth.py`
-2. `./src/api.py`

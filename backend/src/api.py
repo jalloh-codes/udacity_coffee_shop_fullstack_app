@@ -35,11 +35,15 @@ def after_request(response):
         or appropriate status code indicating reason for failure
 '''
 
-
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    drinks = Drink.query.all()
 
+    try:
+        drinks = Drink.query.all()
+
+    except Exception as e:
+        print({e})
+        abort(404)
 
     return jsonify({
         "success": True,
@@ -58,18 +62,14 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def drinks_detail(payload):
+
     drinks = Drink.query.all()
 
-    if len(drinks) == 0:
-        abort(404)
-    
-    try:    
-        return jsonify({
-            'success': True,
-            'drinks': [drink.long() for drink in drinks]
-        }), 200
-    except:
-        abort(404)
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long() for drink in drinks]
+    }), 200
+
 
 
 '''
@@ -84,32 +84,24 @@ def drinks_detail(payload):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def add_drink(payload):
-    req = request.get_json()
-    title = req.get('title')
-    recipe = req.get('recipe')
-
-    if req is None:
-        abort(404)
 
     try:
+        req = request.get_json()
+        title = req.get('title')
+        recipe = req.get('recipe')
         new_drink = Drink(
             title = title,
             recipe = json.dumps(recipe))
         new_drink.insert()
-
-        '''
-        all_drinks = Drink.query.all()
-        drinks = [drink.long() for drink in all_drinks]
-        '''
-        print(new_drink)
 
         return jsonify({
             "success": True,
             "drinks": [new_drink.long()]
         }), 200
 
-    except:
-        abort(422)
+    except Exception as e:
+        print(e)
+        abort(401)
 
 '''
 @TODO implement endpoint 
@@ -125,31 +117,22 @@ def add_drink(payload):
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def update_drink(payload, id):
-    req =  request.get_json()
-           
-    drink = Drink.query.filter(Drink.id == id).one_or_none()
-    
-    if drink is None:
-        abort(404)
-
     try:
-        req_title = req.get('title')
-        req_recipe = req.get('recipe')
-
-        if req_title:
-            drink.title =  req_title,
-
-        if req_recipe:
-            drink.recipe = json.dumps(req['recipe'])
-        
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+        req = request.get_json()
+        drink.title = req.get('title', drink.title)
+        drink.recipe = json.dumps(req.get('recipe'))
         drink.update()
+        drinks_all = Drink.query.all()
+        drinks = [drink.long() for drink in drinks_all]
+
+        return jsonify ({
+            "success": True ,
+            "drinks": drinks, 
+            "modiefed_drink_id" : id
+        })
     except:
-        abort(404)
-    return jsonify({
-        'success': True, 
-        'drinks': [drink.long()]
-    }), 200
-    
+        abort(401)
 '''
 # @TODO implement endpoint
 #     DELETE /drinks/<id>
@@ -164,19 +147,18 @@ def update_drink(payload, id):
 @requires_auth('delete:drinks')
 def delete_drink(payload, id):
 
-    drink = Drink.query.filter(Drink.id == id).one_or_none()
-
-    if not drink:
-        abort(404)
+  
     try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
         drink.delete()
+        return jsonify({
+            'success': True,
+            'delete': id
+        }), 200
     except:
-        abort(400)
+        abort(401)
     
-    return jsonify({
-        'success': True,
-        'delete': id
-    }), 200
+
 
 
 ## Error Handling
